@@ -1,8 +1,7 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect,useState } from "react";
 import { Save, Eye, EyeClosed, Trash2 } from "lucide-react";
 
 function App() {
-  const passRef = useRef();
   const [show, setShow] = useState(false);
   const [passType, setPassType] = useState("password");
   const [data, setData] = useState([]);
@@ -20,7 +19,6 @@ function App() {
       setPassType("password");
       setShow(false);
     }
-    console.log(passRef.current.type);
   };
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -38,10 +36,11 @@ function App() {
       form.password.trim() === "" ||
       form.URL.trim() === ""
     ) {
+      alert("Please fill all fields");
       return;
     }
     const savedData = JSON.parse(localStorage.getItem("Data")) || [];
-    const updatedData = [...savedData, { ...form, id: Math.random() }];
+    const updatedData = [...savedData, { ...form, id: Date.now() }];
     localStorage.setItem("Data", JSON.stringify(updatedData));
     setForm({
       URL: "",
