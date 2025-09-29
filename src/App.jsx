@@ -1,12 +1,11 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Save, Eye, EyeClosed, Table } from "lucide-react";
-import DataTable from "./components/DataTable";
+import { Save, Eye, EyeClosed, Trash2 } from "lucide-react";
 
 function App() {
   const passRef = useRef();
   const [show, setShow] = useState(false);
   const [passType, setPassType] = useState("password");
-  const [data, setData] = useState([])
+  const [data, setData] = useState([]);
   const [form, setForm] = useState({
     URL: "",
     username: "",
@@ -27,6 +26,12 @@ function App() {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
   };
+  const getData = () => {
+    const saved = localStorage.getItem("Data");
+    if (saved) {
+      setData(JSON.parse(saved));
+    }
+  };
   const handleSave = () => {
     if (
       form.username.trim() === "" ||
@@ -43,28 +48,30 @@ function App() {
       username: "",
       password: "",
     });
-    getData()
+    getData();
   };
-  const getData = () => {
-    const saved = localStorage.getItem("Data");
-    if (saved) {
-      setData(JSON.parse(saved)); 
-    }
-  }
+  const deleteItem = (item) => {
+    const savedData = JSON.parse(localStorage.getItem("Data")) || [];
+    const updatedData = savedData.filter((e) => item.id !== e.id);
+    localStorage.setItem("Data", JSON.stringify(updatedData));
+    getData();
+  };
   useEffect(() => {
     getData();
   }, []);
-  
-  
+
   return (
     <>
-    <div className="absolute top-0 z-[-2] h-screen w-screen bg-white bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(120,119,198,0.3),rgba(255,255,255,0))]"></div>
+      {/* back ground */}
+      <div className="absolute top-0 z-[-2] h-screen w-screen bg-white bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(120,119,198,0.3),rgba(255,255,255,0))]"></div>
       <div></div>
+      {/* logo */}
       <div className="my-6 w-full h-12 text-3xl flex justify-center gap-2">
         <span className="text-blue-500 font-bold">&lt;</span>
         <b>PassMan</b>
         <span className="text-blue-500 font-bold">/&gt;</span>
       </div>
+      {/* form */}
       <div className="w-full h-38 flex items-center flex-col gap-6">
         <div className="w-3/4 md:w-1/2">
           <input
@@ -123,9 +130,66 @@ function App() {
           </button>
         </div>
       </div>
-      <DataTable data={data}/>
+      {/* table */}
+
+      <div className="w-full max-w-4xl mx-auto mt-20 md:mt-10 p-4">
+        {data.length === 0 ? (
+          <b>No data</b>
+        ) : (
+          <div className="bg-white rounded-xl shadow-xl overflow-hidden border border-gray-200">
+            {/* Scroll wrapper for small screens */}
+            <div className="overflow-x-auto">
+              <table className="min-w-full divide-y divide-gray-200">
+                <thead className="bg-blue-600">
+                  <tr>
+                    <th className="px-6 py-4 text-left text-base font-bold text-white uppercase tracking-wider">
+                      Website URL
+                    </th>
+                    <th className="px-6 py-4 text-left text-base font-bold text-white uppercase tracking-wider">
+                      Username
+                    </th>
+                    <th className="px-6 py-4 text-left text-base font-bold text-white uppercase tracking-wider">
+                      Password
+                    </th>
+                    <th className="px-6 py-4 text-left text-base font-bold text-white uppercase tracking-wider">
+                      Action
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-200">
+                  {data.map((item, index) => (
+                    <tr
+                      key={index}
+                      className={`
+                  ${index % 2 === 0 ? "bg-white" : "bg-gray-50"} 
+                  hover:bg-blue-50 transition duration-150 ease-in-out cursor-pointer
+                `}
+                    >
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                        {item.URL}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {item.username}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {item.password}
+                      </td>
+                      <td
+                        onClick={() => deleteItem(item)}
+                        className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 cursor-pointer"
+                      >
+                        <Trash2 />
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+      </div>
     </>
   );
 }
 
-export default App
+export default App;
