@@ -1,10 +1,12 @@
-import React, { useRef, useState } from "react";
-import { Save, Eye, EyeClosed } from "lucide-react";
+import React, { useEffect, useRef, useState } from "react";
+import { Save, Eye, EyeClosed, Table } from "lucide-react";
+import DataTable from "./components/DataTable";
 
 function App() {
   const passRef = useRef();
   const [show, setShow] = useState(false);
   const [passType, setPassType] = useState("password");
+  const [data, setData] = useState([])
   const [form, setForm] = useState({
     URL: "",
     username: "",
@@ -41,11 +43,22 @@ function App() {
       username: "",
       password: "",
     });
+    getData()
   };
+  const getData = () => {
+    const saved = localStorage.getItem("Data");
+    if (saved) {
+      setData(JSON.parse(saved)); 
+    }
+  }
+  useEffect(() => {
+    getData();
+  }, []);
+  
   
   return (
     <>
-    <div class="absolute top-0 z-[-2] h-screen w-screen bg-white bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(120,119,198,0.3),rgba(255,255,255,0))]"></div>
+    <div className="absolute top-0 z-[-2] h-screen w-screen bg-white bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(120,119,198,0.3),rgba(255,255,255,0))]"></div>
       <div></div>
       <div className="my-6 w-full h-12 text-3xl flex justify-center gap-2">
         <span className="text-blue-500 font-bold">&lt;</span>
@@ -110,6 +123,7 @@ function App() {
           </button>
         </div>
       </div>
+      <DataTable data={data}/>
     </>
   );
 }
